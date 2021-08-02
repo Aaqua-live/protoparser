@@ -75,7 +75,8 @@ fieldoptions: fieldoption ( ","  fieldoption )*
 fieldoption: OPTIONNAME "=" CONSTANT
 repeatedfield: [ comments ] "repeated" field
 
-oneof: "oneof" ONEOFNAME "{" ( oneoffield | EMPTYSTATEMENT )* "}"
+oneof: "oneof" ONEOFNAME oneofbody
+oneofbody: "{" ( oneoffield | EMPTYSTATEMENT )* "}"
 oneoffield: [ comments ] TYPE FIELDNAME "=" FIELDNUMBER [ "[" fieldoptions "]" ] ";"
 
 mapfield: [ comments ] "map" "<" KEYTYPE "," TYPE ">" MAPNAME "=" FIELDNUMBER [ "[" fieldoptions "]" ] TAIL
@@ -117,8 +118,10 @@ COMMENTS: COMMENT ( COMMENT )*
 Comment = typing.NamedTuple('Comment', [('content', str), ('tags', typing.Dict[str, typing.Any])])
 Field = typing.NamedTuple('Field', [('comment', 'Comment'), ('type', str), ('key_type', str), ('val_type', str), ('name', str), ('number', int)])
 Enum = typing.NamedTuple('Enum', [('comment', 'Comment'), ('name', str), ('fields', typing.Dict[str, 'Field'])])
+Oneof = typing.NamedTuple('Oneof', [('comment', 'Comment'), ('name', str), ('fields', typing.Dict[str, 'Field'])])
 Message = typing.NamedTuple('Message', [('comment', 'Comment'), ('name', str), ('fields', typing.List['Field']),
-                                        ('messages', typing.Dict[str, 'Message']), ('enums', typing.Dict[str, 'Enum'])])
+                                        ('messages', typing.Dict[str, 'Message']), ('enums', typing.Dict[str, 'Enum']), 
+                                        ('oneofs', typing.Dict[str, 'Oneof'])])
 Service = typing.NamedTuple('Service', [('name', str), ('functions', typing.Dict[str, 'RpcFunc'])])
 RpcFunc = typing.NamedTuple('RpcFunc', [('name', str), ('in_type', str), ('out_type', str), ('uri', str)])
 ProtoFile = typing.NamedTuple('ProtoFile',
@@ -144,6 +147,7 @@ class ProtoTransformer(Transformer):
         messages = {}
         enums = {}
         fields = []
+        oneofs = {}
         for item in items:
             if isinstance(item, Message):
                 messages[item.name] = item
@@ -151,7 +155,9 @@ class ProtoTransformer(Transformer):
                 enums[item.name] = item
             elif isinstance(item, Field):
                 fields.append(item)
-        return fields, messages, enums
+            elif isinstance(item, Oneof):
+                oneofs[item.name] = item
+        return fields, messages, enums, oneofs
 
     def field(self, tokens):
         '''Returns a Field namedtuple'''
@@ -258,6 +264,40 @@ class ProtoTransformer(Transformer):
                         comment = Comment(token.value, {})
             enumitems.append(Field(comment, 'enum', 'enum', 'enum', name.value, value.value))
         return enumitems
+
+    def oneof(self, tokens):
+        '''Returns an Oneof namedtuple'''
+        comment = Comment("", {})
+        if len(tokens) < 3:
+            name, fields = tokens
+        else:
+            comment, name, fields = tokens
+        return Oneof(comment, name.value, fields)
+
+    def oneofbody(self, tokens):
+        '''Returns a sequence of oneof fields'''
+        oneofitems = []
+        for tree in tokens:
+            if tree.data != 'oneoffield':
+                continue
+            comment = Comment("", {})
+            type = Token("TYPE", "")
+            fieldname = Token("FIELDNAME", "")
+            fieldnumber = Token("FIELDNUMBER", "")
+            for token in tree.children:
+                if isinstance(token, Comment):
+                    comment = token
+                elif isinstance(token, Token):
+                    if token.type == "TYPE":
+                        type = token
+                    elif token.type == "FIELDNAME":
+                        fieldname = token
+                    elif token.type == "FIELDNUMBER":
+                        fieldnumber = token
+                    elif token.type == "COMMENT":
+                        comment = Comment(token.value, {})
+            oneofitems.append(Field(comment, type.value, type.value, type.value, fieldname.value, int(fieldnumber.value)))
+        return oneofitems
 
     def service(self, tokens):
         '''Returns a Service namedtuple'''
