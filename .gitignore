@@ -1,0 +1,5 @@
+venv/
+build/
+*.swp
+proto_parser.egg-info/
+dist/
