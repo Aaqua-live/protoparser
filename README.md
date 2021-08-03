@@ -1,11 +1,18 @@
-# Protoparser
+# Protoparser-ng
 A package for parsing proto3 files
 ## Introduction
-The purpose of this package is to parse the .proto file (version 3) into a Python data structure.
-We use it for code generation or other operations.
+The purpose of this package is to parse the .proto file (version 3) into a
+Python data structure. We use it for code generation or other operations where
+analysing the structure of the schema is the goal. This project is a fork of
+https://github.com/khadgarmage/protoparser by xiaochun.liu with the following
+features/fixes:
+
+- Parse oneof definitions
+- Parse comments without crashing
+
 ## How to Use
 ```
-pip install proto-parser
+pip install proto-parser-ng
 ```
 Output format is as following:
 ```json
@@ -218,6 +225,3 @@ Output format is as following:
   }
 }
 ```
-## Bug Reports and Patches
-If you think you have found a bug, please visit the Protoparser Github page at https://github.com/khadgarmage/protoparser 
-to report an issue, or fix it to push a pull request, thanks.

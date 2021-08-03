@@ -4,13 +4,13 @@ with open("README.md", "r") as fh:
   long_description = fh.read()
 
 setuptools.setup(
-  name="proto-parser",
+  name="proto-parser-ng",
   version="1.6.3",
-  author="xiaochun.liu",
-  author_email="liuxiaochun@apache.org",
+  author="avac74",
+  author_email="andre.cruz@aaqua.live",
   description="A package for parsing proto files",
   long_description_content_type="text/markdown",
-  url="https://github.com/khadgarmage/protoparser",
+  url="https://github.com/Aaqua-live/protoparser-ng",
   packages=setuptools.find_packages(),
   classifiers=[
     "Programming Language :: Python :: 3",
