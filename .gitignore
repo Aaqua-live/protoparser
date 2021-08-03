@@ -3,3 +3,4 @@ build/
 *.swp
 proto_parser.egg-info/
 dist/
+test/__pycache__/
