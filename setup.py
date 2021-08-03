@@ -5,10 +5,10 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
   name="proto-parser-ng",
-  version="1.6.3",
+  version="1.0.0",
   author="avac74",
   author_email="andre.cruz@aaqua.live",
-  description="A package for parsing proto files",
+  description="A package for parsing proto3 files",
   long_description_content_type="text/markdown",
   url="https://github.com/Aaqua-live/protoparser-ng",
   packages=setuptools.find_packages(),

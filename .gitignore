@@ -1,6 +1,6 @@
 venv/
 build/
 *.swp
-proto_parser.egg-info/
+*.egg-info/
 dist/
 test/__pycache__/
