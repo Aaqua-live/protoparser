@@ -1,4 +1,5 @@
-import protoparser
+from protoparser_ng.parser import Message
+import protoparser_ng as protoparser
 
 SCHEMA_WITH_ONEOF = """
 syntax = "proto3";
@@ -10,6 +11,13 @@ message TestMessage {
         string field1 = 1;
         string field2 = 2;
     }
+}
+"""
+
+SCHEMA_WITH_REPEATED = """
+syntax = "proto3";
+message TestMessage {
+    repeated string field1 = 1;
 }
 """
 
@@ -93,6 +101,13 @@ def test_protobuf_oneof():
     assert 1 == len(proto.messages['TestMessage'].fields)                      # must have one primitive field only
     assert 1 == len(proto.messages['TestMessage'].oneofs)                      # must have one oneof only
     assert 2 == len(proto.messages['TestMessage'].oneofs['PAYLOAD'].fields)    # must have two fields in the oneof
+
+def test_protobuf_repeated():
+    proto = protoparser.parse(SCHEMA_WITH_REPEATED)
+    assert 1 == len(proto.messages)
+    assert 1 == len(proto.messages['TestMessage'].fields)
+    assert 'repeated' == proto.messages['TestMessage'].fields[0].type
+    assert 'string' == proto.messages['TestMessage'].fields[0].key_type
 
 def test_protobuf_two_msgs():
     proto = protoparser.parse(SCHEMA_WITH_TWO_MESSAGES)

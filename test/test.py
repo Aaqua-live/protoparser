@@ -16,7 +16,7 @@
 # specific language governing permissions and limitations
 # under the License.
 
-import protoparser
+import protoparser_ng
 
 content = '''syntax = "proto3";
 package service;

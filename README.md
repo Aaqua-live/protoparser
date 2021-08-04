@@ -7,6 +7,10 @@ analysing the structure of the schema is the goal. This project is a fork of
 https://github.com/khadgarmage/protoparser by xiaochun.liu with the following
 features/fixes:
 
+1.0.1
+- small bugfixes, add unit tests
+
+1.0.0
 - Parse oneof definitions
 - Parse comments without crashing
 
